@@ -6,6 +6,6 @@ Extract the files
 
 Open CMD or Terminal in the same directory as where the files were extracted
 
-Type '''npm install'''
+Type *npm install*
 
-To Start the Program Type '''npm run devStart'''
+To Start the Program Type *npm run devStart*
