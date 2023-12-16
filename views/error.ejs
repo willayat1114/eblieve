@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login Error</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+
+  .container {
+    text-align: center;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+
+  h1 {
+    color: #e74c3c;
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+  }
+
+  p {
+    color: #555;
+    font-size: 1.2rem;
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <h1>User or Password Not Found</h1>
+    <p>Contact The DPS Budgam IT Club</p>
+    <a href="#" id="copyEmail">Click to copy E-mail</a>
+    <script>
+      // JavaScript code to copy the email address to clipboard
+      const copyEmailLink = document.getElementById('copyEmail');
+      const emailAddress = 'dpsbitsupport@proton.me'; // Replace with the actual email address
+
+      copyEmailLink.addEventListener('click', (event) => {
+          event.preventDefault();
+
+          // Create a temporary textarea element to facilitate copying
+          const textarea = document.createElement('textarea');
+          textarea.value = emailAddress;
+          document.body.appendChild(textarea);
+
+          // Select and copy the email address from the textarea
+          textarea.select();
+          document.execCommand('copy');
+
+          // Clean up: remove the temporary textarea
+          document.body.removeChild(textarea);
+
+          alert('Email address copied to clipboard: ' + emailAddress);
+      });
+  </script>
+  </div>
+</body>
+</html>

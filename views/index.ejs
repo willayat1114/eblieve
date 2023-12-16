@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/stylesheets/style.css" type="text/css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+      integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.9.359/pdf.min.js"
+      integrity="sha512-U5C477Z8VvmbYAoV4HDq17tf4wG6HXPC6/KM9+0/wEXQQ13gmKY2Zb0Z2vu0VNUWch4GlJ+Tl/dfoLOH4i2msw=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <title>PDF Viewer</title>
+  </head>
+  <body>
+    <main>
+      <h3>PDF Viewer</h3>
+      <canvas class="pdf-viewer"></canvas>
+    </main>
+    <footer>
+      <ul class="pagination">
+        <li>
+          <button id="previous">
+            <i class="fas fa-arrow-alt-circle-left"></i> Previous
+          </button>
+        </li>
+        <li>
+          <span id="zoomValue">100%</span>
+          <input
+            type="range"
+            id="zoom"
+            name="zoom"
+            min="50"
+            max="200"
+            value="100"
+            step="10"
+          />
+        </li>
+        <li>
+          <span id="current_page">1 of 1</span>
+        </li>
+        <li>
+          <button id="next">
+            Next <i class="fas fa-arrow-alt-circle-right"></i>
+          </button>
+        </li>
+      </ul>
+    </footer>
+    <script type="text/javascript">
+      const currentPage = document.getElementById("current_page");
+      const viewer = document.querySelector(".pdf-viewer");
+      let currentPDF = {};
+
+      document.addEventListener("contextmenu", (event) => {
+        event.preventDefault();
+      });
+
+      function resetCurrentPDF() {
+        currentPDF = {
+          file: null,
+          countOfPages: 0,
+          currentPage: 1,
+          zoom: 1.0, // Adjusted default zoom to 1.0 (100%)
+        };
+      }
+
+      pdfjsLib.GlobalWorkerOptions.workerSrc =
+        "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.9.359/pdf.worker.min.js";
+
+      function loadPDF(source) {
+        const loadingTask = pdfjsLib.getDocument(source);
+        resetCurrentPDF();
+
+        loadingTask.promise
+          .then((pdfDocument) => {
+            currentPDF.file = pdfDocument;
+            currentPDF.countOfPages = pdfDocument.numPages;
+            viewer.classList.remove("hidden");
+            document.querySelector("main h3").classList.add("hidden");
+            renderCurrentPage();
+          })
+          .catch((error) => {
+            console.error("Error loading PDF:", error);
+            alert(
+              "Error loading PDF. Please check the file path and try again."
+            );
+          });
+      }
+
+      loadPDF("/pdf/book2.pdf"); // Change the source here
+
+      document.getElementById("zoom").addEventListener("input", () => {
+        if (currentPDF.file) {
+          const zoomInput = document.getElementById("zoom");
+          const zoomValue = parseInt(zoomInput.value);
+          document.getElementById("zoomValue").innerHTML = zoomValue + "%";
+          currentPDF.zoom = zoomValue / 100;
+          renderCurrentPage();
+        }
+      });
+
+      document.getElementById("next").addEventListener("click", () => {
+        const isValidPage = currentPDF.currentPage < currentPDF.countOfPages;
+        if (isValidPage) {
+          currentPDF.currentPage += 1;
+          renderCurrentPage();
+        }
+      });
+
+      document.getElementById("previous").addEventListener("click", () => {
+        const isValidPage = currentPDF.currentPage - 1 > 0;
+        if (isValidPage) {
+          currentPDF.currentPage -= 1;
+          renderCurrentPage();
+        }
+      });
+
+      function renderCurrentPage() {
+        currentPDF.file.getPage(currentPDF.currentPage).then((page) => {
+          var context = viewer.getContext("2d");
+          var viewport = page.getViewport({ scale: currentPDF.zoom });
+          viewer.height = viewport.height;
+          viewer.width = viewport.width;
+
+          var renderContext = {
+            canvasContext: context,
+            viewport: viewport,
+          };
+          page.render(renderContext);
+        });
+        currentPage.innerHTML =
+          currentPDF.currentPage + " of " + currentPDF.countOfPages;
+      }
+      loadingTask.promise
+        .then((pdfDocument) => {
+          console.log("PDF loaded successfully"); // Add this line
+          currentPDF.file = pdfDocument;
+          currentPDF.countOfPages = pdfDocument.numPages;
+          viewer.classList.remove("hidden");
+          document.querySelector("main h3").classList.add("hidden");
+          renderCurrentPage();
+        })
+        .catch((error) => {
+          console.error("Error loading PDF:", error);
+          alert("Error loading PDF. Please check the file path and try again.");
+        });
+    </script>
+  </body>
+</html>
